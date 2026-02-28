@@ -139,3 +139,9 @@ frontend/dist/
 
 # System Files
 Thumbs.db
+
+# Backend debug / scratch files
+backend/output.txt
+backend/test-connections.js
+backend/test-pdf.js
+backend/test.pdf

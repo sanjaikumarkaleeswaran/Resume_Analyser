@@ -1,114 +1,121 @@
 # ResumeMatch AI
 
-> **Free AI-powered ATS Resume Optimizer** — paste your resume + job description, get an optimized version with ATS score in seconds.
-
-## Tech Stack
-- **Frontend**: Vite + React + Tailwind CSS → Deployed on Vercel
-- **Backend**: Node.js + Express → Deployed on Render
-- **Auth + DB + Storage**: Supabase (PostgreSQL + Auth)
-- **AI**: Groq (free tier — `llama-3.3-70b-versatile`)
+> **Free AI-powered ATS Resume Optimizer** — upload your resume, paste a job description, and get a professionally rewritten version with an ATS keyword score in seconds.
 
 ---
 
-## 🗄️ Supabase Database Setup
+## 🚀 Tech Stack
 
-Run this SQL in your Supabase project's **SQL Editor**:
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | React 19 + Vite + Tailwind CSS |
+| **Backend** | Node.js + Express 5 |
+| **Database** | MongoDB Atlas (via Mongoose) |
+| **Authentication** | Custom JWT (JSON Web Tokens) |
+| **AI Engine** | Groq API — `llama-3.3-70b-versatile` (free tier) |
+| **PDF Parsing** | `pdf-parse` |
+| **Security** | Helmet, Rate Limiting, bcryptjs |
 
-```sql
--- Create the resume_requests table
-CREATE TABLE resume_requests (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-  created_at timestamptz DEFAULT now(),
-  resume_text text,
-  job_description text,
-  experience_level text,
-  professional_summary text,
-  optimized_experience text,
-  skills_section text,
-  keyword_match_score integer,
-  missing_keywords text[],
-  suggestions text
-);
+---
 
--- Enable Row Level Security
-ALTER TABLE resume_requests ENABLE ROW LEVEL SECURITY;
+## ✨ Features
 
--- Policy: users can only access their own records
-CREATE POLICY "Users manage own records"
-  ON resume_requests
-  FOR ALL
-  USING (auth.uid() = user_id);
-```
-
-Also in **Supabase Dashboard → Authentication → Settings**:
-- Enable **Email/Password** provider
-- You can disable "Confirm email" for quick local testing
+| Feature | Status |
+|---------|--------|
+| Email / Password Sign Up & Login | ✅ |
+| JWT-based Protected Routes | ✅ |
+| PDF Resume Upload (up to 5MB) | ✅ |
+| Resume Text Paste | ✅ |
+| AI-powered Resume Rewriting (Groq) | ✅ |
+| ATS Keyword Match Score (0–100) | ✅ |
+| Missing Keywords Detection | ✅ |
+| Professional Summary Generation | ✅ |
+| Optimized Experience Bullets | ✅ |
+| Skills Section Rewrite | ✅ |
+| Improvement Suggestions | ✅ |
+| Copy to Clipboard | ✅ |
+| Download Result as PDF | ✅ |
+| Optimization History (last 20) | ✅ |
+| Mobile Responsive | ✅ |
+| Dark Mode UI | ✅ |
+| Rate Limiting (DoS protection) | ✅ |
 
 ---
 
 ## ⚙️ Environment Variables
 
-### Backend (`backend/.env`)
+The project uses a **single shared `.env` file** at the root directory that powers both the frontend and the backend.
+
+Create a `.env` file in the root of the project:
+
 ```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_KEY=your-service-role-key        # From Supabase → Settings → API → service_role
-GROQ_API_KEY=your-groq-api-key                    # From https://console.groq.com (free)
+# ============================================================
+# ResumeMatch AI — Shared .env (frontend + backend)
+# ============================================================
+
+# --- MongoDB Atlas ---
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>
+
+# --- JWT Secret (use a long random string in production) ---
+JWT_SECRET=your_super_secret_jwt_key_here
+
+# --- Groq AI (free at https://console.groq.com) ---
+GROQ_API_KEY=your_groq_api_key_here
 GROQ_MODEL=llama-3.3-70b-versatile
+
+# --- Server ---
 PORT=3001
 FRONTEND_URL=http://localhost:5173
-```
 
-### Frontend (`frontend/.env`)
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-public-key       # From Supabase → Settings → API → anon key
+# --- Frontend (Vite reads VITE_ prefixed vars) ---
 VITE_API_URL=http://localhost:3001
 ```
 
+> ⚠️ **Never commit your `.env` file.** It is listed in `.gitignore` by default.
+
 ---
 
-## 🚀 Local Development
+## 🛠️ Local Development
 
-### 1. Clone and install
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/resume-maker.git
+cd resume-maker
+```
+
+### 2. Install dependencies
 
 ```bash
 # Backend
-cd "d:\AI_Projects\resume maker\backend"
+cd backend
 npm install
 
-# Frontend
-cd "d:\AI_Projects\resume maker\frontend"
+# Frontend (open a new terminal)
+cd frontend
 npm install
 ```
 
-### 2. Set up environment files
+### 3. Set up your environment
 
-```bash
-# Backend
-cp backend/.env.example backend/.env
-# Fill in backend/.env
-
-# Frontend
-cp frontend/.env.example frontend/.env
-# Fill in frontend/.env
-```
-
-### 3. Run the Supabase SQL schema (see above)
+Create the `.env` file in the **root** of the project (see the template above) and fill in your:
+- MongoDB Atlas connection string
+- JWT secret key
+- Groq API key (free at [console.groq.com](https://console.groq.com))
 
 ### 4. Start both servers
 
 ```bash
-# Terminal 1 — Backend
+# Terminal 1 — Backend (runs on http://localhost:3001)
 cd backend
 npm run dev
 
-# Terminal 2 — Frontend
+# Terminal 2 — Frontend (runs on http://localhost:5173)
 cd frontend
 npm run dev
 ```
 
-Open **http://localhost:5173**
+Then open **http://localhost:5173** in your browser.
 
 ---
 
@@ -116,71 +123,85 @@ Open **http://localhost:5173**
 
 ### Frontend → Vercel
 1. Push project to GitHub
-2. Import frontend folder in Vercel
+2. Go to [vercel.com](https://vercel.com) → **New Project** → Import your repo
 3. Set **Root Directory** → `frontend`
-4. Add env vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_API_URL` (your Render URL)
-5. Deploy
+4. Add environment variable: `VITE_API_URL` = your Render backend URL
+5. Click **Deploy**
 
 ### Backend → Render
-1. Create new **Web Service** → connect GitHub repo
+1. Go to [render.com](https://render.com) → **New Web Service** → Connect your GitHub repo
 2. Set **Root Directory** → `backend`
 3. **Build Command**: `npm install`
 4. **Start Command**: `npm start`
-5. Add env vars: all from `backend/.env`
-6. Copy the Render URL to Vercel `VITE_API_URL` and backend `FRONTEND_URL`
+5. Add all environment variables from your `.env` file:
+   - `MONGODB_URI`
+   - `JWT_SECRET`
+   - `GROQ_API_KEY`
+   - `GROQ_MODEL`
+   - `PORT`
+   - `FRONTEND_URL` (your Vercel URL)
+6. Copy the Render backend URL and paste it into your Vercel `VITE_API_URL` variable
 
 ---
 
 ## 📁 Project Structure
 
 ```
-resume maker/
+resume-maker/
+├── .env                          # Shared env file (not committed)
+├── .gitignore
+├── README.md
 ├── backend/
-│   ├── server.js               # Express entry point
+│   ├── server.js                 # Express app entry point
 │   ├── middleware/
-│   │   └── auth.js             # Supabase JWT validation
+│   │   └── auth.js               # JWT authentication middleware
+│   ├── models/
+│   │   ├── User.js               # Mongoose User schema (bcrypt hashed passwords)
+│   │   └── ResumeRequest.js      # Mongoose Resume optimization record schema
 │   ├── routes/
-│   │   ├── optimize.js         # POST /api/optimize
-│   │   └── history.js          # GET /api/history
+│   │   ├── auth.js               # POST /api/auth/signup, /login, GET /api/auth/me
+│   │   ├── optimize.js           # POST /api/optimize (PDF upload + AI processing)
+│   │   └── history.js            # GET /api/history (last 20 optimizations)
 │   └── utils/
-│       ├── groq.js             # Groq AI + master prompt
-│       └── pdfParser.js        # PDF text extraction
+│       ├── groq.js               # Groq AI client + master ATS prompt
+│       └── pdfParser.js          # pdf-parse wrapper for PDF text extraction
 └── frontend/
-    ├── src/
-    │   ├── context/
-    │   │   └── AuthContext.jsx  # Supabase auth state
-    │   ├── services/
-    │   │   ├── supabase.js      # Supabase client
-    │   │   └── api.js           # Axios client
-    │   ├── components/
-    │   │   ├── Navbar.jsx
-    │   │   ├── ProtectedRoute.jsx
-    │   │   ├── ResumeForm.jsx
-    │   │   ├── ResultsPanel.jsx
-    │   │   └── HistoryList.jsx
-    │   └── pages/
-    │       ├── Login.jsx
-    │       ├── Signup.jsx
-    │       └── Dashboard.jsx
+    ├── index.html
+    ├── vite.config.js
     ├── tailwind.config.js
-    └── index.html
+    └── src/
+        ├── App.jsx               # Routes + AuthProvider wrapper
+        ├── context/
+        │   └── AuthContext.jsx   # Global JWT auth state (login, signup, logout)
+        ├── services/
+        │   └── api.js            # Axios client with JWT interceptor
+        ├── components/
+        │   ├── Navbar.jsx
+        │   ├── ProtectedRoute.jsx
+        │   ├── ResumeForm.jsx
+        │   ├── ResultsPanel.jsx
+        │   └── HistoryList.jsx
+        └── pages/
+            ├── Login.jsx
+            ├── Signup.jsx
+            └── Dashboard.jsx
 ```
 
 ---
 
-## ✅ Features
+## 🔐 API Endpoints
 
-| Feature | Status |
-|---------|--------|
-| Email/Password Auth | ✅ |
-| PDF Upload | ✅ |
-| Resume Text Paste | ✅ |
-| AI Optimization (Groq) | ✅ |
-| ATS Score + Progress Bar | ✅ |
-| Tabbed Results | ✅ |
-| Copy to Clipboard | ✅ |
-| Download as PDF | ✅ |
-| Optimization History | ✅ |
-| Mobile Responsive | ✅ |
-| Dark Mode | ✅ |
-| Rate Limiting | ✅ |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/api/auth/signup` | ❌ | Register a new user |
+| `POST` | `/api/auth/login` | ❌ | Login and receive JWT |
+| `GET` | `/api/auth/me` | ✅ | Get current logged-in user |
+| `POST` | `/api/optimize` | ✅ | Upload PDF or paste text + job description → get AI result |
+| `GET` | `/api/history` | ✅ | Fetch the last 20 optimization records |
+| `GET` | `/health` | ❌ | Health check |
+
+---
+
+## 📄 License
+
+MIT — Free to use and modify.
