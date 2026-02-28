@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: #070e1a;
+    color: #f1f5f9;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    @apply bg-primary-600 hover:bg-primary-500 active:bg-primary-700 text-white font-semibold py-2.5 px-5 rounded-lg transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-400;
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1e293b;
+    @apply hover:bg-slate-700 text-slate-200 font-medium py-2 px-4 rounded-lg border border-slate-600 hover:border-slate-500 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-400;
+  }
+
+  .card {
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    background-color: #0f172a;
+  }
+
+  .input-field {
+    @apply w-full border border-slate-600 text-slate-100 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+    background-color: #1e293b;
+    width: 100%;
+  }
+
+  .input-field::placeholder {
+    color: #64748b;
+  }
+
+  .tab-btn {
+    @apply px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
+  }
+
+  .tab-btn.active {
+    @apply bg-primary-600 text-white;
+  }
+
+  .tab-btn:not(.active) {
+    @apply text-slate-400 hover:text-slate-200;
+    background-color: transparent;
+  }
+
+  .tab-btn:not(.active):hover {
+    background-color: #1e293b;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out;
+}
